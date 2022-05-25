@@ -247,3 +247,53 @@ UINT GetCode(std::string& filename){
     handle.close();
     return rt;
 }*/
+bool is_connected(){
+    DWORD flag;
+    bool connection= false;
+    connection= InternetGetConnectedState(&flag,0);
+    return connection;
+}
+bool ExistWinget(){
+    printf(CSI "?1049h");
+    int temp= system("winget");
+    std::cout<<CSI"2J";
+    printf(CSI "?1049l");
+    return !temp;
+}
+LPCWSTR String2LPCWSTR(const std::string& input){
+    int len=input.length();
+    int lenbf=MultiByteToWideChar(CP_ACP,0,input.c_str(),len,0,0);
+    wchar_t* buffer=new wchar_t [lenbf];
+    MultiByteToWideChar(CP_ACP,0,input.c_str(),len,buffer,sizeof(wchar_t)*lenbf);
+    buffer[len]=0;
+    return buffer;
+}
+bool GetWinget(){
+    std::cout<<"To use the tool, I will install winget to your computer"<<std::endl;
+    std::cout<<R"(The temporary installer will be download to "D:\\a.msixdunble". accept(y) or enter a new directory(should not be C:\))"<<std::endl;
+    std::string temp;
+    std::cin>>temp;
+    if(temp=="y"){
+        temp="D:\\a.msixdunble";
+    }
+    LPCWSTR buffer= String2LPCWSTR(temp);
+    //download
+    bool a=(URLDownloadToFileW(NULL,
+                               L"https://github.com/microsoft/winget-cli/releases/download/v1.3.1391-preview/Microsoft.DesktopAppInstaller_8wekyb3d8bbwe.msixbundle",
+                               buffer,
+                               0, 0)==S_OK);
+    std::cout<<"waiting: "<<ESC "[ ? 25 l"<<CSI"34m"<<CSI"s";
+    int pe=0;
+    while(pe<101){
+        std::cout<<pe<<"/100"<<CSI"u";
+    }
+    std::cout<<CSI"0m";
+    printf(ESC "[ ? 25 h");
+    if(!a){
+        std::cerr<<"error installation";
+        return false;
+    }
+    //call the installer
+    system(temp.c_str());
+    return true;
+}
