@@ -8,4 +8,4 @@ Implemented features:
 * Insert mode  
 * command control(only w and q)  
 * save the file  
-The project does not include main() function, for more usage and information, please read the "main.cpp" in main project.  
+## The project does not include main() function, for more usage and information, please read the "main.cpp" in the main project.  
